@@ -2,7 +2,7 @@
 
 const { Client } = require("pg");
 
-const DB_URI = process.env.NODE_ENV === "test"  
+const DB_URI = process.env.NODE_ENV === "test"
     ? "postgresql:///biztime_test"
     : "postgresql:///biztime";
 
@@ -11,7 +11,7 @@ let db = new Client({
 });
 
 db.connect();
-
+console.log("i am running")
 module.exports = db;
 
 

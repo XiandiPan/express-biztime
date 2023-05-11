@@ -1,7 +1,7 @@
 
 const express = require("express");
 const db = require("../db");
-const { BadRequestError } = require("../expressError");
+const { BadRequestError,NotFoundError } = require("../expressError");
 const router = express.Router();
 
 
@@ -51,9 +51,9 @@ router.get("/:code", async function (req, res, next) {
     FROM companies
     WHERE code = $1`, [code]);
 
-  const company = results.rows;
-  if (company.length === 0) {
-    throw new BadRequestError;
+  const company = results.rows[0];
+  if (!company) {
+    throw new NotFoundError();
   }
   // console.log("Company =====", company);
   return res.json({ company });
@@ -115,18 +115,21 @@ router.put("/:code", async function(req,res,next){
 
   const {name, description} = req.body;
 
-  console.log("*****name",req.body.name)
+  console.log("*****name",req.body.name);
   const result = await db.query(
     `UPDATE companies
     SET name=$1,
     description=$2
     WHERE code=$3
     RETURNING code, name, description`,[name, description,req.params.code ]
-  )
+  );
 
-  console.log("** result===", result)
-
+  console.log("** result===", result);
   const company = result.rows[0];
+  if (!company) {
+    throw new NotFoundError();
+  };
+
   return res.json({company})
 
 })
@@ -135,10 +138,17 @@ router.put("/:code", async function(req,res,next){
 /** Delete company*/
 
 router.delete("/:code", async function (req, res, next) {
-  await db.query(
-    "DELETE FROM companies WHERE code = $1",
+
+  const result = await db.query(
+    "DELETE FROM companies WHERE code = $1 RETURNING code",
     [req.params.code],
   );
+
+  const company = result.rows[0];
+  if (!company) {
+    throw new NotFoundError();
+  }
+
   return res.json({ message: "Deleted" });
 });
 //--end
