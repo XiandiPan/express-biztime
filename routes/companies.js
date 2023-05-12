@@ -1,18 +1,18 @@
 
 const express = require("express");
 const db = require("../db");
-const { BadRequestError,NotFoundError } = require("../expressError");
+const { BadRequestError, NotFoundError } = require("../expressError");
 const router = express.Router();
 
 
 /** Get all companies, will return
  * {
-	"companies": [
-		{
-			"code": "ibm",
-			"name": "IBM"
-		}
-	]
+  "companies": [
+    {
+      "code": "ibm",
+      "name": "IBM"
+    }
+  ]
 }
 */
 router.get("/", async function (req, res, next) {
@@ -20,7 +20,7 @@ router.get("/", async function (req, res, next) {
     `SELECT code, name
       FROM  companies`
   );
-  // console.log("result",results);
+  // console.log("result",results); TODO: order by ????
 
   const companies = results.rows;
 
@@ -34,13 +34,13 @@ router.get("/", async function (req, res, next) {
 /** GET company by code, will return
  *
  * {
-	"company": [
-		{
-			"code": "ibm",
-			"name": "IBM",
-			"description": "Big blue."
-		}
-	]
+  "company": [
+    {
+      "code": "ibm",
+      "name": "IBM",
+      "description": "Big blue."
+    }
+  ]
 }
 */
 router.get("/:code", async function (req, res, next) {
@@ -63,13 +63,13 @@ router.get("/:code", async function (req, res, next) {
 
 /** Adds new company to DB, will return
  *{
-	"company": [
-		{
-			"code": "microsoft",
-			"name": "Microsoft",
-			"description": "Maker of Windows OS."
-		}
-	]
+  "company": [
+    {
+      "code": "microsoft",
+      "name": "Microsoft",
+      "description": "Maker of Windows OS."
+    }
+  ]
 }
  *
 */
@@ -94,34 +94,34 @@ router.post("/", async function (req, res, next) {
  *{
 
 
-			"name": "Apple phone",
-			"description": "phone"
+      "name": "Apple phone",
+      "description": "phone"
 
 
 }
 return:
  * {
-	"company": {
-		"code": "apple",
-		"name": "Apple phone",
-		"description": "phone"
-	}
+  "company": {
+    "code": "apple",
+    "name": "Apple phone",
+    "description": "phone"
+  }
 }
 */
 
-router.put("/:code", async function(req,res,next){
-  console.log(req.body)
+router.put("/:code", async function (req, res, next) {
+  console.log(req.body);
   if (!req.body) throw new BadRequestError();
 
-  const {name, description} = req.body;
+  const { name, description } = req.body;
 
-  console.log("*****name",req.body.name);
+  console.log("*****name", req.body.name);
   const result = await db.query(
     `UPDATE companies
     SET name=$1,
     description=$2
     WHERE code=$3
-    RETURNING code, name, description`,[name, description,req.params.code ]
+    RETURNING code, name, description`, [name, description, req.params.code]
   );
 
   console.log("** result===", result);
@@ -130,9 +130,9 @@ router.put("/:code", async function(req,res,next){
     throw new NotFoundError();
   };
 
-  return res.json({company})
+  return res.json({ company });
 
-})
+});
 //--end
 
 /** Delete company*/
